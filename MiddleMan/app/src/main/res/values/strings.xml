@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">InOut Hackathon Demo</string>
+    <string name="title_activity_emotiondetection_actvity">Emotion Detection Demo</string>
+</resources>
