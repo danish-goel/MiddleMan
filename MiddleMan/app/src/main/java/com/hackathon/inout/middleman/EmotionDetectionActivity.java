@@ -370,7 +370,7 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
             intent2.putExtra("log","DD-"+String.valueOf(d));
             sendBroadcast(intent2);
 
-            if(d>8){
+            if(d>9.5){
 
                 int decision = filter.add(1);
                 if(decision==0){
