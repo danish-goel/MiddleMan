@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
         button_messaging.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(MainActivity.this, MessagingActivity.class);
+                Intent myIntent = new Intent(MainActivity.this, LoginActivity.class);
                 MainActivity.this.startActivity(myIntent);
             }
         });

@@ -5,16 +5,28 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.hackathon.inout.middleman.classes.HorizontalList;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
@@ -47,14 +59,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import hod.api.hodclient.HODApps;
 import hod.api.hodclient.HODClient;
 import hod.api.hodclient.IHODClientCallback;
-import hod.response.parser.HODErrorObject;
 import hod.response.parser.HODResponseParser;
 
-public class MessagingActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, IHODClientCallback {
+public class MessagingActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, IHODClientCallback, View.OnClickListener {
+
+    //global varibles for views
+    RecyclerView mRecyclerView;
+    LinearLayoutManager mLayoutManager;
+    RecyclerView.Adapter mAdapter;
+
+    RecyclerView hRecyclerView;
+    LinearLayoutManager hLayoutManager;
+    RecyclerView.Adapter hAdapter;
+    List<ParseObject> messages = new ArrayList<>();
+    EditText comments_input;
+    //-------------------
+
 
     HODClient hodClient;
     HODResponseParser hodParser;
@@ -63,8 +89,8 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     private BroadcastReceiver receiver;
     private Mat mGray;
 
-    static int max_neighbors=-1;
-    static int min_neighbors=-1;
+    static int max_neighbors = -1;
+    static int min_neighbors = -1;
 
     public static Filter filter;
 
@@ -83,8 +109,8 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     private Boolean running = true;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-        public void onManagerConnected(int status){
-            switch(status){
+        public void onManagerConnected(int status) {
+            switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                     initializeOpenCVDependencies();
                     mOpenCvCameraView.enableView();
@@ -109,51 +135,100 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     public void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
-        filter=new Filter();
+        filter = new Filter();
 
         hodClient = new HODClient("74e993bb-0893-4b4a-bcf0-b23d7f142f61", this);
         hodParser = new HODResponseParser();
 
-        useHODClient();
+//        useHODClient();
+
+
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_6, this, mLoaderCallback);
 
         setContentView(R.layout.activity_messaging);
+        viewoncreate();
 
         mOpenCvCameraView = (JavaCameraView) findViewById(R.id.camera_view);
         mOpenCvCameraView.setVisibility(CameraBridgeViewBase.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
         mOpenCvCameraView.setCameraIndex(1);
 
-        mood = (ImageView) findViewById(R.id.mood);
+//        mood = (ImageView) findViewById(R.id.mood);
         mButtonStart = (Button) findViewById(R.id.button_start);
         mButtonStop = (Button) findViewById(R.id.button_stop);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction("ADDLOG_C");
 
-        mButtonStart.setOnClickListener(new View.OnClickListener() {
+//        mButtonStart.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mOpenCvCameraView.enableView();
+//                running = true;
+////                setButtons();
+//            }
+//        });
+
+//        mButtonStop.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mOpenCvCameraView.disableView();
+//                running = false;
+////                setButtons();
+//            }
+//        });
+
+//        setButtons();
+
+    }
+
+
+    public void viewoncreate() {
+//        setContentView(R.layout.activity_temp_chatscreen);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        toolbar.setTitle(getOtherUserName());
+//        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+//        setSupportActionBar(toolbar);
+
+        List<String> list = new ArrayList<>();
+        list.add("dalla");
+        list.add("randi");
+        list.add("bc");
+
+        hRecyclerView = (RecyclerView) findViewById(R.id.horizontal_recyclerview);
+        hLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        hRecyclerView.setLayoutManager(hLayoutManager);
+        hAdapter = new HorizontalList(list, MessagingActivity.this);
+        hRecyclerView.setAdapter(hAdapter);
+
+        Log.d("user", ParseUser.getCurrentUser().getString("Name"));
+        comments_input = (EditText) findViewById(R.id.comments_input);
+        FloatingActionButton Submit = (FloatingActionButton) findViewById(R.id.Submit);
+        Submit.setOnClickListener(this);
+
+        comments_input.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View v) {
-                mOpenCvCameraView.enableView();
-                running = true;
-                setButtons();
+            public void afterTextChanged(Editable mEdit) {
+                String text = mEdit.toString();
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
 
-        mButtonStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mOpenCvCameraView.disableView();
-                running = false;
-                setButtons();
-            }
-        });
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mLayoutManager = new LinearLayoutManager(this);
+        mAdapter = new ConversationList(messages, this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
 
-        setButtons();
-
+        new FetchMessagesTask().execute();
     }
 
     private void initializeOpenCVDependencies() {
@@ -175,8 +250,9 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
             is.close();
             os.close();
             File file = new File(mCascadeFile.getAbsolutePath());
-            if(file.exists())
-                System.out.println(mCascadeFile.getAbsolutePath());;
+            if (file.exists())
+                System.out.println(mCascadeFile.getAbsolutePath());
+            ;
             cascadeClassifier = new CascadeClassifier(mCascadeFile.getAbsolutePath());
             System.out.println(cascadeClassifier.load(mCascadeFile.getAbsolutePath()));
 
@@ -256,19 +332,17 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
 
         Rect[] facesArray = faces.toArray();
         System.out.println(facesArray.length);
-        for (int i = 0; i <facesArray.length; i++)
-        {
+        for (int i = 0; i < facesArray.length; i++) {
 
-            Mat grayScaleImageROI= null;
+            Mat grayScaleImageROI = null;
             MatOfRect nestedObjects = new MatOfRect();
             Imgproc.rectangle(inputFrame, facesArray[0].tl(), facesArray[i].br(), new Scalar(0, 255, 0, 255), 3);
 
-            final int half_height = (int)Math.round((float)facesArray[0].height * 0.5);
+            final int half_height = (int) Math.round((float) facesArray[0].height * 0.5);
             facesArray[0].y = facesArray[0].y + half_height;
             facesArray[0].height = half_height;
             Imgproc.rectangle(inputFrame, facesArray[0].tl(), facesArray[0].br(), new Scalar(0, 255, 0, 255), 3);
             grayScaleImageROI = inputFrame.submat(facesArray[0]);
-
 
 
 //            if (cascadeClassifierSmile != null) {
@@ -276,12 +350,11 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
 //            }
 
             // Crop Mouth
-            final int onethird_width = (int)Math.round((float)grayScaleImageROI.width() * 0.33);
+            final int onethird_width = (int) Math.round((float) grayScaleImageROI.width() * 0.33);
             facesArray[0].x = facesArray[0].x + onethird_width;
             facesArray[0].width = onethird_width;
             Imgproc.rectangle(inputFrame, facesArray[0].tl(), facesArray[0].br(), new Scalar(0, 255, 0, 255), 3);
             grayScaleImageROI = inputFrame.submat(facesArray[0]);
-
 
 
             ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
@@ -300,9 +373,9 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
             Imgproc.HoughLinesP(smallImg2, lines, 1, Math.PI / 180, 20, 15, 10);
 
             for (int j = 0; j < lines.cols(); j++) {
-                double[] l          = lines.get(0, j);
-                Point startPoint    = new Point(l[0], l[1]);
-                Point endPoint      = new Point(l[2], l[3]);
+                double[] l = lines.get(0, j);
+                Point startPoint = new Point(l[0], l[1]);
+                Point endPoint = new Point(l[2], l[3]);
 
                 Imgproc.line(smallImg2, startPoint, endPoint, new Scalar(255, 0, 255), 1);
             }
@@ -358,7 +431,7 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
 
             int smile_neighbors = (int) nestedArray.length;
 
-            if(min_neighbors ==-1)
+            if (min_neighbors == -1)
                 min_neighbors = smile_neighbors;
 
             max_neighbors = Math.max(max_neighbors, smile_neighbors);
@@ -366,37 +439,35 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
             MatOfDouble mu = new MatOfDouble();
             MatOfDouble sigma = new MatOfDouble();
             Core.meanStdDev(grayScaleImageROI, mu, sigma);
-            double d = mu.get(0,0)[0];
+            double d = mu.get(0, 0)[0];
 
-            System.out.println("LOL-"+String.valueOf(d));
-            if(d>25){
+            System.out.println("LOL-" + String.valueOf(d));
+            if (d > 25) {
 
                 int decision = filter.add(1);
-                if(decision==0){
+                if (decision == 0) {
                     runOnUiThread(new Runnable() {
                         public void run() {
                             mOpenCvCameraView.setBackground(getDrawable(R.drawable.blue2));
                         }
                     });
 
-                    Decision.decision=0;
+                    Decision.decision = 0;
                     return inputFrame;
-                }
-                else{
+                } else {
                     runOnUiThread(new Runnable() {
                         public void run() {
                             mOpenCvCameraView.setBackground(getDrawable(R.drawable.green2));
                         }
                     });
-                    Decision.decision=1;
+                    Decision.decision = 1;
                     return inputFrame;
                 }
 
-            }
-            else{
+            } else {
 
                 int decision = filter.add(0);
-                if(decision==0){
+                if (decision == 0) {
                     runOnUiThread(new Runnable() {
                         public void run() {
                             mOpenCvCameraView.setBackground(getDrawable(R.drawable.blue2));
@@ -404,17 +475,16 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
                         }
                     });
 
-                    Decision.decision=0;
+                    Decision.decision = 0;
                     return inputFrame;
-                }
-                else{
+                } else {
                     runOnUiThread(new Runnable() {
                         public void run() {
                             mOpenCvCameraView.setBackground(getDrawable(R.drawable.green2));
                         }
                     });
 
-                    Decision.decision=1;
+                    Decision.decision = 1;
                     return inputFrame;
                 }
             }
@@ -433,15 +503,15 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
         return inputFrame;
     }
 
-    public void setButtons() {
-        if (running == true) {
-            mButtonStart.setEnabled(false);
-            mButtonStop.setEnabled(true);
-        } else {
-            mButtonStart.setEnabled(true);
-            mButtonStop.setEnabled(false);
-        }
-    }
+//    public void setButtons() {
+//        if (running == true) {
+//            mButtonStart.setEnabled(false);
+//            mButtonStop.setEnabled(true);
+//        } else {
+//            mButtonStart.setEnabled(true);
+//            mButtonStop.setEnabled(false);
+//        }
+//    }
 
 
     @Override
@@ -490,5 +560,139 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     @Override
     public void onErrorOccurred(String errorMessage) {
         // handle error if any
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.Submit) {
+            writeNewMessage(comments_input.getText().toString());
+            comments_input.setText("");
+
+        }
+    }
+
+    public class FetchMessagesTask extends AsyncTask<Void, Void, Void> {
+
+
+        public FetchMessagesTask() {
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("Message");
+            query.include("sender");
+            query.orderByAscending("updatedAt");
+            try {
+                messages.addAll(query.find());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+
+            mAdapter = new ConversationList(messages, MessagingActivity.this);
+            mRecyclerView.setAdapter(mAdapter);
+//            Log.d("mssa",fetchedMessages.size()+"");
+            int delay = 0; // delay for 1 sec.
+            int period = 3000; // repeat every 10 sec.
+            Timer timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                public void run() {
+                    new FetchNewPushMessagesTask().execute();
+                }
+            }, delay, period);
+            super.onPostExecute(result);
+        }
+
+    }
+
+    public class FetchNewPushMessagesTask extends AsyncTask<Void, Void, Void> {
+
+        List<ParseObject> newMessages = new ArrayList<>();
+
+        public FetchNewPushMessagesTask() {
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ParseObject lastObject = messages.get(messages.size() - 1);
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("Message");
+            query.include("sender");
+            query.whereGreaterThan("updatedAt", lastObject.getCreatedAt());
+            try {
+                newMessages.addAll(query.find());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if (newMessages.size() > 0) {
+                Log.d("new message", "adding data");
+                for (ParseObject p : newMessages) {
+                    messages.add(p);
+                    mAdapter.notifyItemInserted(messages.size() - 1);
+                }
+            } else {
+                Log.d("new message", "no new data");
+            }
+//            Log.d("mssa",fetchedMessages.size()+"");
+            super.onPostExecute(result);
+        }
+
+    }
+
+
+    public boolean writeNewMessage(String data) {
+        ParseObject message = new ParseObject("Message");
+        message.put("data", data);
+        message.put("sender", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
+        message.put("recipient", ParseObject.createWithoutData("_User", getRecpeintObjectID()));
+        message.saveInBackground();
+        message.put("sender", ParseUser.getCurrentUser());
+        messages.add(message);
+        mAdapter.notifyItemInserted(messages.size() - 1);
+        return true;
+
+    }
+
+    //Hardcoded data
+    String getRecpeintObjectID() {
+        if (ParseUser.getCurrentUser().getUsername() == "danishgoel") {
+            return "YlfLHR5uNz";
+        } else {
+            return "PYvZtP3MDl";
+        }
+    }
+
+    //Hardcoded data
+    String getOtherUserName() {
+        if (ParseUser.getCurrentUser().getString("username").equals("danishgoel")) {
+            return "Sarthak Ahuja";
+        } else {
+            return "Danish Goel";
+        }
     }
 }
