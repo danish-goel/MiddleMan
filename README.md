@@ -28,19 +28,15 @@ While the idea was just an idea in this hackathon and we had a whole bunch of in
 
 Being a text completion bot, the application should be as real-time as possible. While we used a REST API for getting autocomplete words and their sentiments, we did not want to add an overload of having the vision component too being done over REST. APIs such as [4] and [5] though provide some good APIs, they unfortunately are extremely poor to use in this context of sentiment analysis of a person's face in real time. The human face gives tiny micro expression which collectively over a time period decide and we would eventually miss out on a lot of analysis time and data if we went in a REST API for such a task. Hence, we decided to code up a quick algorithm ourselves. While deep learning algorithms and implentations claim for a superior accuracy, they take a huge time to train and the available trained models too run take a while (not real time) to generate an output, not to mention that they make the app bulky. Since we were dealing with a binary case here of classifying a "positive" and "non-positive" user sentiment, we went for a statistical machine learning approach of HAAR cascades to first identify the face and then identify the micro-expression. 
 
-<flow chart>
-
 Given the time constraints we focussed on one micro-expression - **The Human Smile** which we extracted using a thresholding based templating method after isolating the mouth on the face and fittig Hough transform lines. We refer the initial HAAR cascade code from [1] for initial stages, but considerably modify their much significant later part of the algorithm as it failed in our context. The following images show the process of extracting the smile from the face. 
 
 <image>
 
 Since we work in real time on a stream of face images, the output stream is bound to be noisy on which we apply a mean filter for smoother operation.
 
-<flow chart>
+After obtaining the sentiment of the user we can move towards using the Haven API's to aid text completion and prune their response based on the user's sentiment using the HOD sentiment analysis API. The following summarises our approach - 
 
-After obtaining the sentiment of the user we can move towards using the Haven API's to aid text completion and prune their response based on the user's sentiment using the HOD sentiment analysis API. 
-
-<flow chart>
+![flowchart](./images/flowchart.png)
 
 ## Final Product
 
