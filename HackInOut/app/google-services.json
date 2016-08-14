@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "187015193685",
+    "firebase_url": "https://hackinout-227fb.firebaseio.com",
+    "project_id": "hackinout-227fb",
+    "storage_bucket": "hackinout-227fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187015193685:android:3496f6323ea7aba5",
+        "android_client_info": {
+          "package_name": "com.example.danish.hackinout"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "187015193685-4e377knrum8ctur41pkeebj0cbqllpdv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLfYOa9XjWTRp8FSpmaekr8Qw__AmWBWM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
