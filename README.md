@@ -10,15 +10,15 @@ Closest Track - *"Build your Bot with Advance Al engine"*
 ## Idea
 While we saw most of the participants had jumped into coding chat bots usig standard APIs, we took this hackathon as an opportunity to experiment and hack into something new a bot could possibly do, besides just finding keywords in your questions to come up with answers. We realized that instead of just reading our text, **could the bot possible read our face as well**? 
 
+The idea we came up with was -
 ![Logo](./MiddleMan/app/src/main/res/drawable/middleman.png)
 
-The idea we came up with was . We call it middleman as it aids the communication you have by acting as middle filter. 
-!
+ We call it middleman as it aids the communication you have with anyone by acting as middle filter. The idea was to make a bot with eyes which could see you type and with the help of some intelligent vision algorithm gather enough context to make it's suggestions smarter.
 This lead us to finding some interesting use-cases of a bot which could **see us text** and possibly make some of it's own decisions a tad bit smarter - 
 
- - One usecase would be more meaning text predictions
- - Another possible usecase of a seeing bot could be managing possible text conflicts. Example - 
- - It could also be use for collaborative decisions between two people involved in a chat to provide a gentle nudge, a more human communication of what the other person is feeling while reading yor texts in order to modify your responses without a direct communication with any of the parties. A true middleman indeed.
+ - One usecase would be more meaningful text predictions. How often do we get predications just based on our chat history which often do not coincide with the kind of conversation we are having? Accidental click and sends(and apologies) are very common. Example, what if you sent "shut up" instead of "shut down" just because "shut up" is more your thing? Wouldn't it help if the bot could **see** you in a neutral and not angry mood, to help out give you better autocomplete after "shut"?
+ - Another possible usecase of a seeing bot could be managing possible textual conflicts. Example - a bot analysing your tone of text and facial expressions can alert you to be a little careful while typing or pressing send on that button. As the popular saying goes, a word/text out of you/your device is like an arrow leaving a bow, irreversible. Possibly staying shut would do you more benefit in such a case. 
+ - It could also be use for collaborative decisions between two people involved in a chat to provide a gentle nudge, a more human communication of what the other person is feeling while reading yor texts in order to modify your suggestions without a direct communication with any of the parties. A true middleman indeed.
 
 While the idea was just an idea in this hackathon and we had a whole bunch of incentives to use some sponsor APIs, we went with experimenting with the first use case for this hackathon as it's implementation would give us answers for possible explorations in the later usecases and would be a good se of the limited time we had. 
 
@@ -65,10 +65,10 @@ Our code is an android application where
 
 ## References
 
- - [1] Smile Mood Meter, MIT ()[]
- - [2] HOD Text Completion API ()[]
- - [3] HOD Sentiment Analysis API ()[]
- - [4] Google Cloud Vision ()[]
- - [5] Helix, PreCog Research Group ()[]
- - [6] OpenCV ()[]
- - [7] Parse ()[]
+ - [1] Smile Mood Meter, MIT [Link](https://www.cs.rit.edu/~wmb1306/smilemoodmeter/)
+ - [2] HOD Text Completion API [Link](https://dev.havenondemand.com/apis/autocomplete)
+ - [3] HOD Sentiment Analysis API [Link](https://dev.havenondemand.com/apis/analyzesentiment)
+ - [4] Google Cloud Vision [Link](https://cloud.google.com/vision/)
+ - [5] Helix, PreCog Research Group [Link](http://labs.precog.iiitd.edu.in/resources/Helix/)
+ - [6] OpenCV [Link](http://opencv.org/platforms/android.html)
+ - [7] Parse [Link](http://parse.com/)
