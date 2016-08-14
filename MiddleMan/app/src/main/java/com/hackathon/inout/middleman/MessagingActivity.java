@@ -16,6 +16,7 @@ import android.widget.ImageView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
@@ -43,9 +44,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import hod.api.hodclient.HODApps;
+import hod.api.hodclient.HODClient;
+import hod.api.hodclient.IHODClientCallback;
+import hod.response.parser.HODErrorObject;
+import hod.response.parser.HODResponseParser;
 
-public class MessagingActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class MessagingActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, IHODClientCallback {
+
+    HODClient hodClient;
+    HODResponseParser hodParser;
 
     private static final String TAG = "MiddleMan::EDActivity";
     private BroadcastReceiver receiver;
@@ -98,6 +110,12 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
         Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
         filter=new Filter();
+
+        hodClient = new HODClient("74e993bb-0893-4b4a-bcf0-b23d7f142f61", this);
+        hodParser = new HODResponseParser();
+
+        useHODClient();
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_6, this, mLoaderCallback);
@@ -434,5 +452,43 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     @Override
     public void onStop() {
         super.onStop();
+    }
+
+    private void useHODClient_AUTOCOMPLETE(String s) {
+        String hodApp = HODApps.AUTO_COMPLETE;
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("text", s);
+
+        hodClient.GetRequest(params, hodApp, HODClient.REQ_MODE.SYNC);
+    }
+
+    private void useHODClient_SENTIMENTANALYSIS_LIST(List<String> stringList) {
+
+    }
+
+    private void _useHODClient_SENTIMENTANALYSIS_SINGLE(String word) {
+        String hodApp = HODApps.AUTO_COMPLETE;
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("text", "al");
+
+        hodClient.GetRequest(params, hodApp, HODClient.REQ_MODE.SYNC);
+    }
+
+    @Override
+    public void requestCompletedWithContent(String response) {
+        JSONObject resp = (JSONObject) hodParser.ParseCustomResponse(JSONObject.class, response);
+        if (resp != null) {
+            String values = "";
+        }
+    }
+
+    @Override
+    public void requestCompletedWithJobID(String response) {
+
+    }
+
+    @Override
+    public void onErrorOccurred(String errorMessage) {
+        // handle error if any
     }
 }
