@@ -155,10 +155,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected Void doInBackground(Void... params) {
-            ParseObject lastObject=messages.get(messages.size()-1);
             ParseQuery<ParseObject> query = ParseQuery.getQuery("Message");
             query.include("sender");
-            query.whereGreaterThan("updatedAt",lastObject.getCreatedAt());
+            query.orderByAscending("updatedAt");
             try {
                 newMessages.addAll(query.find());
             } catch (ParseException e) {
@@ -170,16 +169,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPostExecute(Void result) {
-            if(newMessages.size()>0) {
-                Log.d("new message","adding data");
-                for (ParseObject p : newMessages) {
+            int newsize = newMessages.size();
+            int oldsize = messages.size();
+            if (newsize > oldsize) {
+
+                Log.d("new message", "adding data");
+                for (int i = oldsize; i < newsize; i++) {
+
+                    ParseObject p=newMessages.get(i);
                     messages.add(p);
                     mAdapter.notifyItemInserted(messages.size() - 1);
                 }
-            }
-            else
-            {
-                Log.d("new message","no new data");
+
+
+            } else {
+                Log.d("new message", "no new data");
             }
 //            Log.d("mssa",fetchedMessages.size()+"");
             super.onPostExecute(result);
