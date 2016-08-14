@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.example.danish.hackinout.Classes.HorizontalList;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -20,11 +21,17 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     RecyclerView.Adapter mAdapter;
+
+    RecyclerView hRecyclerView;
+    LinearLayoutManager hLayoutManager;
+    RecyclerView.Adapter hAdapter;
     List<ParseObject> messages = new ArrayList<>();
     EditText comments_input;
 
@@ -37,6 +44,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar.setTitle(getOtherUserName());
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
+
+        List<String> list = new ArrayList<>();
+        list.add("dalla");
+        list.add("randi");
+        list.add("bc");
+
+        hRecyclerView = (RecyclerView) findViewById(R.id.horizontal_recyclerview);
+        hLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        hRecyclerView.setLayoutManager(hLayoutManager);
+        hAdapter = new HorizontalList(list, MainActivity.this);
+        hRecyclerView.setAdapter(hAdapter);
 
         Log.d("user", ParseUser.getCurrentUser().getString("Name"));
         comments_input = (EditText) findViewById(R.id.comments_input);
@@ -108,10 +126,67 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mAdapter = new ConversationList(messages, MainActivity.this);
             mRecyclerView.setAdapter(mAdapter);
 //            Log.d("mssa",fetchedMessages.size()+"");
+            int delay = 0; // delay for 1 sec.
+            int period = 3000; // repeat every 10 sec.
+            Timer timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                public void run() {
+                    new FetchNewPushMessagesTask().execute();
+                }
+            }, delay, period);
             super.onPostExecute(result);
         }
 
     }
+
+    public class FetchNewPushMessagesTask extends AsyncTask<Void, Void, Void> {
+
+        List<ParseObject> newMessages = new ArrayList<>();
+
+        public FetchNewPushMessagesTask() {
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ParseObject lastObject=messages.get(messages.size()-1);
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("Message");
+            query.include("sender");
+            query.whereGreaterThan("updatedAt",lastObject.getCreatedAt());
+            try {
+                newMessages.addAll(query.find());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if(newMessages.size()>0) {
+                Log.d("new message","adding data");
+                for (ParseObject p : newMessages) {
+                    messages.add(p);
+                    mAdapter.notifyItemInserted(messages.size() - 1);
+                }
+            }
+            else
+            {
+                Log.d("new message","no new data");
+            }
+//            Log.d("mssa",fetchedMessages.size()+"");
+            super.onPostExecute(result);
+        }
+
+    }
+
 
     public boolean writeNewMessage(String data) {
         ParseObject message = new ParseObject("Message");
@@ -119,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         message.put("sender", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
         message.put("recipient", ParseObject.createWithoutData("_User", getRecpeintObjectID()));
         message.saveInBackground();
-        message.put("sender",ParseUser.getCurrentUser());
+        message.put("sender", ParseUser.getCurrentUser());
         messages.add(message);
         mAdapter.notifyItemInserted(messages.size() - 1);
         return true;
@@ -134,15 +209,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return "PYvZtP3MDl";
         }
     }
+
     //Hardcoded data
-    String getOtherUserName()
-    {
-        if(ParseUser.getCurrentUser().getString("username").equals("danishgoel"))
-        {
+    String getOtherUserName() {
+        if (ParseUser.getCurrentUser().getString("username").equals("danishgoel")) {
             return "Sarthak Ahuja";
-        }
-        else
-        {
+        } else {
             return "Danish Goel";
         }
     }

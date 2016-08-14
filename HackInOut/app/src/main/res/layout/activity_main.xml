@@ -23,10 +23,6 @@
 
             <include layout="@layout/content_main" />
 
-
-
-
-
             <RelativeLayout
                 android:id="@+id/submit_complaint_button"
                 android:layout_width="fill_parent"
@@ -36,38 +32,52 @@
                 android:layout_alignParentRight="true"
                 android:orientation="horizontal">
 
-                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="fill_parent"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/comments_input"
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/horizontal_recyclerview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
+                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/comments_view"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="4dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/comment_box"
-                        android:hint="Type a message"
-                        android:maxLines="3"
-                        android:minLines="2"
-                        android:padding="8dp"
-                        android:inputType="textFilter|textMultiLine"
-                        android:text="" />
+                        android:orientation="horizontal">
 
-                    <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/Submit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:src="@drawable/send"
-                        app:fabSize="mini" />
+                        <EditText
+                            android:id="@+id/comments_input"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginRight="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/comment_box"
+                            android:hint="Type a message"
+                            android:inputType="textFilter|textMultiLine"
+                            android:maxLines="3"
+                            android:minLines="2"
+                            android:padding="8dp"
+                            android:text="" />
 
-
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/Submit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/send"
+                            app:fabSize="mini" />
+                    </LinearLayout>
                 </LinearLayout>
+
+
             </RelativeLayout>
+
         </RelativeLayout>
     </LinearLayout>
 
