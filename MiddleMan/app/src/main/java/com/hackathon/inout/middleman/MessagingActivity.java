@@ -194,7 +194,7 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     }
 
 
-    public void viewoncreate() {
+    public synchronized void viewoncreate() {
 //        setContentView(R.layout.activity_temp_chatscreen);
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        toolbar.setTitle(getOtherUserName());
@@ -218,12 +218,17 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
             public void afterTextChanged(Editable mEdit) {
                 String text = mEdit.toString();
                 useHODClient_AUTOCOMPLETE(text);
+
                 if (words != null) {
+                    Log.d("json","completed requested for"+text);
                     autoCompeleteList.clear();
                     autoCompeleteList.addAll(words.getWords());
                     hAdapter = new HorizontalList(autoCompeleteList, MessagingActivity.this, comments_input);
                     hRecyclerView.setAdapter(hAdapter);
 
+                }
+                else {
+                    Log.d("json","null completed requested for"+text);
                 }
             }
 
@@ -537,6 +542,7 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     }
 
     private void useHODClient_AUTOCOMPLETE(String s) {
+        Log.d("json","sent request for "+s);
         String hodApp = HODApps.AUTO_COMPLETE;
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("text", s);
@@ -598,6 +604,8 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
 
                 }
                 monitor=true;
+                hAdapter = new HorizontalList(requestedWords, MessagingActivity.this, comments_input);
+                hRecyclerView.setAdapter(hAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
