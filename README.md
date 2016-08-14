@@ -9,10 +9,11 @@ Closest Track - *"Build your Bot with Advance Al engine"*
 
 ## Idea
 While we saw most of the participants had jumped into coding chat bots usig standard APIs, we took this hackathon as an opportunity to experiment and hack into something new a bot could possibly do, besides just finding keywords in your questions to come up with answers. We realized that instead of just reading our text, **could the bot possible read our face as well**? 
-<add image>
-MiddleMan/MiddleMan/app/src/main/res/drawable/middleman.png
+
+![Logo](./MiddleMan/app/src/main/res/drawable/middleman.png)
+
 The idea we came up with was . We call it middleman as it aids the communication you have by acting as middle filter. 
-<add image>
+!
 This lead us to finding some interesting use-cases of a bot which could **see us text** and possibly make some of it's own decisions a tad bit smarter - 
 
  - One usecase would be more meaning text predictions
@@ -22,7 +23,9 @@ This lead us to finding some interesting use-cases of a bot which could **see us
 While the idea was just an idea in this hackathon and we had a whole bunch of incentives to use some sponsor APIs, we went with experimenting with the first use case for this hackathon as it's implementation would give us answers for possible explorations in the later usecases and would be a good se of the limited time we had. 
 
 ## Implementation
-<add image>
+
+![faceonly](./images/faceonly.png)
+
 Being a text completion bot, the application should be as real-time as possible. While we used a REST API for getting autocomplete words and their sentiments, we did not want to add an overload of having the vision component too being done over REST. APIs such as [4] and [5] though provide some good APIs, they unfortunately are extremely poor to use in this context of sentiment analysis of a person's face in real time. The human face gives tiny micro expression which collectively over a time period decide and we would eventually miss out on a lot of analysis time and data if we went in a REST API for such a task. Hence, we decided to code up a quick algorithm ourselves. While deep learning algorithms and implentations claim for a superior accuracy, they take a huge time to train and the available trained models too run take a while (not real time) to generate an output, not to mention that they make the app bulky. Since we were dealing with a binary case here of classifying a "positive" and "non-positive" user sentiment, we went for a statistical machine learning approach of HAAR cascades to first identify the face and then identify the micro-expression. 
 
 <flow chart>
@@ -43,7 +46,7 @@ After obtaining the sentiment of the user we can move towards using the Haven AP
 
 The following is working snapshot of the application:
 
-<image>
+![combined](./images/combined.png)
 
 ## Code/APIs/Dependencies
 
