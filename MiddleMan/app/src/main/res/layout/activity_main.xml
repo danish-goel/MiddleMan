@@ -15,15 +15,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:layout_weight="9">
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Launch Demo"
+            android:text="Launch Emotion Detection Demo"
             android:textColor="#FFFFFF"
             android:backgroundTint="@color/colorPrimary"
             android:id="@+id/button_middleman"
+            android:layout_gravity="center_vertical" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Launch Messaging App Demo"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="@color/colorPrimary"
+            android:id="@+id/button_messaging"
             android:layout_gravity="center_vertical" />
     </LinearLayout>
 </LinearLayout>
