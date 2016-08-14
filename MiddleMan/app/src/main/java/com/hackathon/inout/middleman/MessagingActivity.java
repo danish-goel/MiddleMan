@@ -194,7 +194,7 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     }
 
 
-    public synchronized void viewoncreate() {
+    public void viewoncreate() {
 //        setContentView(R.layout.activity_temp_chatscreen);
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        toolbar.setTitle(getOtherUserName());
@@ -583,6 +583,7 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
             monitor = false;
             for(String str:words.getWords()) {
                 useHODClient_SENTIMENTANALYSIS(str);
+
                 requestedWords.add(str);
             }
         } else {
@@ -606,6 +607,7 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
                 monitor=true;
                 hAdapter = new HorizontalList(requestedWords, MessagingActivity.this, comments_input);
                 hRecyclerView.setAdapter(hAdapter);
+                Log.d("json","sentiment"+x);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
