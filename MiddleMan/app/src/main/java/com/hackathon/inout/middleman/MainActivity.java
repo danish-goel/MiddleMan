@@ -12,6 +12,7 @@ public class MainActivity extends Activity {
     private static final String    TAG                 = "MiddleMan::MainActivity";
 
     private Button button_middleman;
+    private Button button_messaging;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -23,11 +24,20 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         button_middleman=(Button)findViewById(R.id.button_middleman);
+        button_messaging=(Button)findViewById(R.id.button_messaging);
 
         button_middleman.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent myIntent = new Intent(MainActivity.this, EmotionDetectionActivity.class);
+                MainActivity.this.startActivity(myIntent);
+            }
+        });
+
+        button_messaging.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(MainActivity.this, MessagingActivity.class);
                 MainActivity.this.startActivity(myIntent);
             }
         });

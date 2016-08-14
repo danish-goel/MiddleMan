@@ -3,12 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:opencv="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
-    <LinearLayout android:layout_weight="0" android:layout_height="fill_parent" android:layout_width="fill_parent">
+    <LinearLayout android:layout_weight="2" android:layout_height="fill_parent" android:layout_width="fill_parent">
         <org.opencv.android.JavaCameraView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             opencv:camera_id="1"
             android:id="@+id/camera_view" />
     </LinearLayout>
@@ -57,22 +57,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="LOG"
+                    android:text="Your Mood"
                     android:layout_gravity="center"
                     android:id="@+id/textView_log_heading" />
-                <ScrollView
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:id="@+id/scrollView_log_container"
-                     >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="Log"
-                        android:layout_gravity="center_horizontal"
-                        android:id="@+id/textView_log_content" />
-                </ScrollView>
+                    android:id="@+id/mood"/>
             </LinearLayout>
 
         </LinearLayout>

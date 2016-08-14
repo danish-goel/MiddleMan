@@ -3,7 +3,6 @@ package com.hackathon.inout.middleman;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -13,8 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -47,7 +45,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 
-public class EmotionDetectionActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
+public class MessagingActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final String TAG = "MiddleMan::EDActivity";
     private BroadcastReceiver receiver;
@@ -66,10 +64,9 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
     // This is the openCV cascade Classifier for smile detection
     private CascadeClassifier cascadeClassifierSmile;
 
-    private ScrollView mLogScrollView;
-    private TextView mLog;
     private Button mButtonStart;
     private Button mButtonStop;
+    private ImageView mood;
 
     private Boolean running = true;
 
@@ -78,7 +75,6 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
             switch(status){
                 case LoaderCallbackInterface.SUCCESS:
                     initializeOpenCVDependencies();
-
                     mOpenCvCameraView.enableView();
                     break;
                 default:
@@ -106,33 +102,23 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
 
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_6, this, mLoaderCallback);
 
-        setContentView(R.layout.activity_emotiondetection);
+        setContentView(R.layout.activity_messaging);
 
         mOpenCvCameraView = (JavaCameraView) findViewById(R.id.camera_view);
         mOpenCvCameraView.setVisibility(CameraBridgeViewBase.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
         mOpenCvCameraView.setCameraIndex(1);
 
-        mLogScrollView = (ScrollView) findViewById(R.id.scrollView_log_container);
-        mLog = (TextView) findViewById(R.id.textView_log_content);
+        mood = (ImageView) findViewById(R.id.mood);
         mButtonStart = (Button) findViewById(R.id.button_start);
         mButtonStop = (Button) findViewById(R.id.button_stop);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction("ADDLOG_C");
 
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                addLog(intent.getStringExtra("log"));
-            }
-        };
-        registerReceiver(receiver, filter);
-
         mButtonStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clearLog();
                 mOpenCvCameraView.enableView();
                 running = true;
                 setButtons();
@@ -149,7 +135,6 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
         });
 
         setButtons();
-        clearLog();
 
     }
 
@@ -212,10 +197,8 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
     public void onResume() {
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
-            addLog("Internal OpenCV library not found. Using OpenCV Manager for initialization");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
         } else {
-            addLog("OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
     }
@@ -366,35 +349,27 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
             MatOfDouble sigma = new MatOfDouble();
             Core.meanStdDev(grayScaleImageROI, mu, sigma);
             double d = mu.get(0,0)[0];
-            Intent intent2 = new Intent("ADDLOG_C");
-            intent2.putExtra("log","DD-"+String.valueOf(d));
-            sendBroadcast(intent2);
 
-            if(d>8){
+            System.out.println("LOL-"+String.valueOf(d));
+            if(d>25){
 
                 int decision = filter.add(1);
                 if(decision==0){
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            mOpenCvCameraView.setBackground(getDrawable(R.drawable.blue));
+                            mOpenCvCameraView.setBackground(getDrawable(R.drawable.blue2));
                         }
                     });
 
-                    Intent intent = new Intent("ADDLOG_C");
-                    intent.putExtra("log", "Not Positive!");
-                    sendBroadcast(intent);
                     Decision.decision=0;
                     return inputFrame;
                 }
                 else{
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            mOpenCvCameraView.setBackground(getDrawable(R.drawable.green));
+                            mOpenCvCameraView.setBackground(getDrawable(R.drawable.green2));
                         }
                     });
-                    Intent intent = new Intent("ADDLOG_C");
-                    intent.putExtra("log", "Postive!");
-                    sendBroadcast(intent);
                     Decision.decision=1;
                     return inputFrame;
                 }
@@ -406,25 +381,21 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
                 if(decision==0){
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            mOpenCvCameraView.setBackground(getDrawable(R.drawable.blue));
+                            mOpenCvCameraView.setBackground(getDrawable(R.drawable.blue2));
+
                         }
                     });
 
-                    Intent intent = new Intent("ADDLOG_C");
-                    intent.putExtra("log", "Not Positive!");
-                    sendBroadcast(intent);
                     Decision.decision=0;
                     return inputFrame;
                 }
                 else{
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            mOpenCvCameraView.setBackground(getDrawable(R.drawable.green));
+                            mOpenCvCameraView.setBackground(getDrawable(R.drawable.green2));
                         }
                     });
-                    Intent intent = new Intent("ADDLOG_C");
-                    intent.putExtra("log", "Postive!");
-                    sendBroadcast(intent);
+
                     Decision.decision=1;
                     return inputFrame;
                 }
@@ -433,7 +404,7 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
 
         runOnUiThread(new Runnable() {
             public void run() {
-                mOpenCvCameraView.setBackground(getDrawable(R.drawable.white));
+                mOpenCvCameraView.setBackground(getDrawable(R.drawable.white2));
             }
         });
 
@@ -454,15 +425,6 @@ public class EmotionDetectionActivity extends Activity implements CameraBridgeVi
         }
     }
 
-    public void addLog(String log) {
-        Log.i(TAG, log);
-        mLog.append(log + "\n");
-        mLogScrollView.fullScroll(View.FOCUS_DOWN);
-    }
-
-    public void clearLog() {
-        mLog.setText("");
-    }
 
     @Override
     public void onStart() {
