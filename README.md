@@ -30,7 +30,7 @@ Being a text completion bot, the application should be as real-time as possible.
 
 Given the time constraints we focussed on one micro-expression - **The Human Smile** which we extracted using a thresholding based templating method after isolating the mouth on the face and fittig Hough transform lines. We refer the initial HAAR cascade code from [1] for initial stages, but considerably modify their much significant later part of the algorithm as it failed in our context. The following images show the process of extracting the smile from the face. 
 
-<image>
+![samples](./images/samples.png)
 
 Since we work in real time on a stream of face images, the output stream is bound to be noisy on which we apply a mean filter for smoother operation.
 
