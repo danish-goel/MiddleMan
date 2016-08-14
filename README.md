@@ -10,6 +10,7 @@ Closest Track - *"Build your Bot with Advance Al engine"*
 ## Idea
 While we saw most of the participants had jumped into coding chat bots usig standard APIs, we took this hackathon as an opportunity to experiment and hack into something new a bot could possibly do, besides just finding keywords in your questions to come up with answers. We realized that instead of just reading our text, **could the bot possible read our face as well**? 
 <add image>
+MiddleMan/MiddleMan/app/src/main/res/drawable/middleman.png
 The idea we came up with was . We call it middleman as it aids the communication you have by acting as middle filter. 
 <add image>
 This lead us to finding some interesting use-cases of a bot which could **see us text** and possibly make some of it's own decisions a tad bit smarter - 
