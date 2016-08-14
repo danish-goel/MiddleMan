@@ -5,8 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hackathon.inout.middleman.R;
 
@@ -21,10 +21,12 @@ public class HorizontalList extends RecyclerView.Adapter<HorizontalList.MyViewHo
 
     private List<String> moviesList;
     Context mContext;
+    EditText input;
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView suggestion;
+
 
         public MyViewHolder(View view) {
             super(view);
@@ -33,9 +35,10 @@ public class HorizontalList extends RecyclerView.Adapter<HorizontalList.MyViewHo
         }
     }
 
-    public HorizontalList(List<String> moviesList,Context context) {
+    public HorizontalList(List<String> moviesList, Context context, EditText input) {
         this.moviesList = moviesList;
         mContext=context;
+        this.input=input;
     }
 
     @Override
@@ -59,7 +62,18 @@ public class HorizontalList extends RecyclerView.Adapter<HorizontalList.MyViewHo
         if(v.getId()==R.id.tv_suggestion)
         {
             TextView tvsugg=(TextView)v;
-            Toast.makeText(mContext,tvsugg.getText().toString(),Toast.LENGTH_SHORT).show();
+            String text=tvsugg.getText().toString();
+
+            String s="";
+            for(int i=text.length()-1;i>=0;i--)
+            {
+                if(text.charAt(i)==' ')
+                {
+                    s=text.substring(0,i+1);
+                    break;
+                }
+            }
+            input.setText(s+text);
         }
     }
 

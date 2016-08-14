@@ -22,12 +22,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.gson.Gson;
 import com.hackathon.inout.middleman.classes.HorizontalList;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -78,12 +80,15 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     LinearLayoutManager hLayoutManager;
     RecyclerView.Adapter hAdapter;
     List<ParseObject> messages = new ArrayList<>();
+    List<String> autoCompeleteList = new ArrayList<>();
     EditText comments_input;
+    boolean monitor = true;
     //-------------------
 
 
     HODClient hodClient;
     HODResponseParser hodParser;
+    Words words;
 
     private static final String TAG = "MiddleMan::EDActivity";
     private BroadcastReceiver receiver;
@@ -107,6 +112,8 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
     private ImageView mood;
 
     private Boolean running = true;
+
+    List<String> requestedWords = new ArrayList<>();
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         public void onManagerConnected(int status) {
@@ -143,13 +150,14 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
 //        useHODClient();
 
 
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_6, this, mLoaderCallback);
 
         setContentView(R.layout.activity_messaging);
         viewoncreate();
+
+//        useHODClient_AUTOCOMPLETE("dan");
 
         mOpenCvCameraView = (JavaCameraView) findViewById(R.id.camera_view);
         mOpenCvCameraView.setVisibility(CameraBridgeViewBase.VISIBLE);
@@ -193,26 +201,30 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
 //        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
 //        setSupportActionBar(toolbar);
 
-        List<String> list = new ArrayList<>();
-        list.add("dalla");
-        list.add("randi");
-        list.add("bc");
-
-        hRecyclerView = (RecyclerView) findViewById(R.id.horizontal_recyclerview);
-        hLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        hRecyclerView.setLayoutManager(hLayoutManager);
-        hAdapter = new HorizontalList(list, MessagingActivity.this);
-        hRecyclerView.setAdapter(hAdapter);
 
         Log.d("user", ParseUser.getCurrentUser().getString("Name"));
         comments_input = (EditText) findViewById(R.id.comments_input);
         FloatingActionButton Submit = (FloatingActionButton) findViewById(R.id.Submit);
         Submit.setOnClickListener(this);
 
+        hRecyclerView = (RecyclerView) findViewById(R.id.horizontal_recyclerview);
+        hLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        hRecyclerView.setLayoutManager(hLayoutManager);
+        hAdapter = new HorizontalList(autoCompeleteList, MessagingActivity.this, comments_input);
+        hRecyclerView.setAdapter(hAdapter);
+
         comments_input.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable mEdit) {
                 String text = mEdit.toString();
+                useHODClient_AUTOCOMPLETE(text);
+                if (words != null) {
+                    autoCompeleteList.clear();
+                    autoCompeleteList.addAll(words.getWords());
+                    hAdapter = new HorizontalList(autoCompeleteList, MessagingActivity.this, comments_input);
+                    hRecyclerView.setAdapter(hAdapter);
+
+                }
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -536,20 +548,61 @@ public class MessagingActivity extends Activity implements CameraBridgeViewBase.
 
     }
 
-    private void _useHODClient_SENTIMENTANALYSIS_SINGLE(String word) {
-        String hodApp = HODApps.AUTO_COMPLETE;
+//    private void _useHODClient_SENTIMENTANALYSIS_SINGLE(String word) {
+//        String hodApp = HODApps.AUTO_COMPLETE;
+//        Map<String, Object> params = new HashMap<String, Object>();
+//        params.put("text", "al");
+//
+//        hodClient.GetRequest(params, hodApp, HODClient.REQ_MODE.SYNC);
+//    }
+
+    private void useHODClient_SENTIMENTANALYSIS(String word) {
+        String hodApp = HODApps.ANALYZE_SENTIMENT;
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("text", "al");
+        params.put("text", word);
 
         hodClient.GetRequest(params, hodApp, HODClient.REQ_MODE.SYNC);
     }
 
+
     @Override
     public void requestCompletedWithContent(String response) {
-        JSONObject resp = (JSONObject) hodParser.ParseCustomResponse(JSONObject.class, response);
-        if (resp != null) {
-            String values = "";
+        if (monitor == true) {
+            JSONObject resp = (JSONObject) hodParser.ParseCustomResponse(JSONObject.class, response);
+            Gson gson = new Gson();
+
+
+            words = gson.fromJson(response, Words.class);
+            Log.d("json", words.toString());
+            monitor = false;
+            for(String str:words.getWords()) {
+                useHODClient_SENTIMENTANALYSIS(str);
+                requestedWords.add(str);
+            }
+        } else {
+            try {
+                JSONObject obj = new JSONObject(response);
+                JSONObject aggregate = obj.getJSONObject("aggregate");
+                String x = aggregate.getString("sentiment");
+                if ((x == "neutral" || x == "positive") && Decision.decision == 1) {
+
+                } else if (x == "negative" && Decision.decision == 0) {
+
+                } else {
+                    if (requestedWords.size() > 0) {
+                        String s = requestedWords.get(0);
+                        requestedWords.remove(0);
+                        words.getWords().remove(s);
+                    }
+
+
+                }
+                monitor=true;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
+//        Log.d("autocomepe", autoCompleteWords.toString());
     }
 
     @Override
